@@ -576,6 +576,29 @@
   }
   form.addEventListener("input", function(e){ var w = e.target.closest(".fld"); if (w) w.classList.remove("bad"); if (e.target.id === "consent") document.getElementById("consent-wrap").classList.remove("bad"); });
 
+  // Zoho drops background (fetch) posts, so submit a real form into a hidden iframe,
+  // exactly like Zoho's own embed code does.
+  function postForm(action, params){
+    return new Promise(function(resolve){
+      var name = "zoho_sink_" + Date.now();
+      var ifr = document.createElement("iframe");
+      ifr.name = name; ifr.title = "crm"; ifr.setAttribute("aria-hidden", "true");
+      ifr.style.cssText = "position:absolute;width:1px;height:1px;border:0;left:-9999px;top:0";
+      document.body.appendChild(ifr);
+      var f = document.createElement("form");
+      f.method = "POST"; f.action = action; f.target = name; f.acceptCharset = "UTF-8"; f.style.display = "none";
+      params.forEach(function(v, k){
+        var i = document.createElement("input"); i.type = "hidden"; i.name = k; i.value = v; f.appendChild(i);
+      });
+      document.body.appendChild(f);
+      var done = false;
+      function finish(){ if (!done) { done = true; resolve(); } }
+      ifr.addEventListener("load", finish);
+      setTimeout(finish, 4000);           // never block the thank-you message
+      f.submit();
+    });
+  }
+
   form.addEventListener("submit", function(e){
     e.preventDefault();
     document.getElementById("form-error").style.display = "none";
@@ -622,7 +645,7 @@
       LEADCF22: data.adid,           // Google Ad ID
       aG9uZXlwb3Q: ""                // Zoho honeypot, must stay empty
     });
-    var sends = [fetch(z.ACTION, {method: "POST", mode: "no-cors", body: zf})];
+    var sends = [postForm(z.ACTION, zf)];
 
     // ---- Google Sheet (Apps Script web app) ----
     var ep = window.LP_CONFIG.LEAD_ENDPOINT;
