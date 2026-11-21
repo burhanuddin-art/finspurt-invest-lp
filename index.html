@@ -16,7 +16,7 @@
 <script>
   window.LP_CONFIG = {
     // Google Apps Script web app URL (see apps-script.gs). Leads are written to your Google Sheet.
-    LEAD_ENDPOINT: "PASTE_APPS_SCRIPT_WEB_APP_URL_HERE",   // optional Google Sheet backup
+    LEAD_ENDPOINT: "https://script.google.com/macros/s/AKfycbytIO4hYofDs5CBaTkpitRokD6GcTR1B2yD1vKEUchcCDJDjugwTy1T0jFuHJKjbBPRSg/exec",   // Google Sheet: Finspurt Fortune 20 – Google Ads Leads
     // Zoho CRM Web-to-Lead form "lead form google ads" (crm.zoho.in)
     ZOHO: {
       ACTION: "https://crm.zoho.in/crm/WebToLeadForm",
@@ -624,7 +624,7 @@
     });
     var sends = [fetch(z.ACTION, {method: "POST", mode: "no-cors", body: zf})];
 
-    // ---- Optional Google Sheet backup ----
+    // ---- Google Sheet (Apps Script web app) ----
     var ep = window.LP_CONFIG.LEAD_ENDPOINT;
     if (ep.indexOf("http") === 0) sends.push(fetch(ep, {method: "POST", mode: "no-cors", body: new URLSearchParams(data)}).catch(function(){}));
     var send = Promise.all(sends);
